@@ -1,0 +1,36 @@
+Code Challenge
+Task
+Implement a TypeScript contact-sync planning function for a backend service that receives contacts from an external CRM such as HubSpot or Bullhorn.
+The function must validate and normalize incoming contacts, deduplicate records, compare them with existing PostgreSQL-style records, and return deterministic create, update, skip, and rejection results.
+Inputs
+Incoming contacts with externalId, email, name, and updatedAt.
+Existing contacts with id, email, name, and sourceUpdatedAt.
+A function signature of planContactSync(incoming, existing).
+Duplicate incoming records should be resolved by normalized email, keeping the record with the latest updatedAt. If timestamps are equal, keep the later input record.
+Email normalization should trim whitespace and convert the value to lowercase.
+Name normalization should trim leading and trailing whitespace and collapse repeated internal whitespace.
+Invalid records must be rejected when the email is missing or invalid, the name is missing, or updatedAt is not a valid timestamp.
+Existing records should be matched by normalized email.
+An incoming record should be skipped when it contains no newer information than the existing record.
+The result must be deterministic and safe to run repeatedly with the same input.
+Deliverables
+Implement planContactSync in TypeScript.
+Return four collections named creates, updates, skipped, and rejected.
+Include a short explanation of how the implementation could be exposed through a Node.js API endpoint.
+Include at least four test cases covering successful creation, update, duplicate resolution, and invalid input.
+The expected result shape is:
+type SyncPlan = {
+  creates: ContactToWrite[];
+  updates: ContactToWrite[];
+  skipped: Array<{ email: string; reason: string }>;
+  rejected: Array<{ input: IncomingContact; reason: string }>;
+};
+Constraints
+Use only the TypeScript or JavaScript standard library.
+Do not call external APIs, PostgreSQL, or authentication services during the exercise.
+Treat the provided existing contacts as the result of a database query.
+Do not mutate the input arrays.
+Keep business logic separate from HTTP, database, and CRM-specific code.
+Preserve the existing database id when producing an update.
+Sort output records by normalized email to make results deterministic.
+Assume the function may be called repeatedly with the same CRM payload.
